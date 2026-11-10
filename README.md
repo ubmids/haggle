@@ -37,7 +37,7 @@ The same tools are on `window.haggle.call(name, args)` and at `POST /api/shops/:
 
 - The price comes from a deterministic rules engine (`src/negotiate.js`): up to three rounds, a halfway counter, bundles can reach the floor, single items only go halfway from list to floor.
 - When an Anthropic API key is set, Claude writes the shop's reply and may suggest a price, but the result is clamped back between the floor and the rules engine's counter. Refusals, errors and timeouts fall back to the rules. Accepted deals never go through the model.
-- Floors are never sent to agents or the page. A test checks tool responses for leaks.
+- Floors are never sent to agents or the page. A test checks search results for leaks.
 - PayPal runs in sandbox only. The client refuses any host that isn't `api-m.sandbox.paypal.com`.
 - Payment is approved by the person in PayPal. An agent can start a checkout but can't finish one.
 
