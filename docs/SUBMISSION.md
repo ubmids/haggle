@@ -51,8 +51,8 @@ Reading the catalog from a shop's existing product markup (JSON-LD), shop-wide r
 
 ## Try it
 
-- Live demo: (hosted URL)
-- Merchant view: (hosted URL)/merchant/
+- Live demo: https://haggle-jet.vercel.app
+- Merchant view: https://haggle-jet.vercel.app/merchant/
 - Code: https://github.com/ubmids/haggle
 - Run locally: `npm install && npm run dev`, then open http://localhost:3000. No PayPal account needed in mock mode; set `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` for sandbox.
 
