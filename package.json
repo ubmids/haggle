@@ -1,0 +1,23 @@
+{
+  "name": "haggle",
+  "version": "0.1.0",
+  "description": "One script tag makes any shop buyable by AI agents, with a shop-side deal-maker that never goes under your floor price, and PayPal checkout.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "PAYPAL_MODE=mock node --watch src/server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "ag-grid-community": "^36.2.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.0"
+  }
+}

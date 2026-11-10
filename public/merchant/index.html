@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Merchant view</title>
+  <style>
+    :root { --bg:#f7f4ef; --ink:#221d17; --muted:#766b5d; --card:#fff; --line:#e6dfd4; --good:#1f7a45; --warn:#9a5b00; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#151310; --ink:#f0ebe4; --muted:#a69a8b; --card:#1e1b17; --line:#322c26; --good:#4fc184; --warn:#e2a64a; } }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif; }
+    header { max-width:1200px; margin:0 auto; padding:20px 16px 8px; display:flex; flex-wrap:wrap; gap:8px 16px; align-items:baseline; justify-content:space-between; }
+    h1 { margin:0; font-size:22px; }
+    .mode { font-size:12px; padding:2px 8px; border-radius:999px; background:#fff3cd; color:#6b4e00; }
+    main { max-width:1200px; margin:0 auto; padding:8px 16px 40px; }
+    .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin:8px 0 20px; }
+    .tile { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+    .tile b { display:block; font-size:24px; font-variant-numeric:tabular-nums; }
+    .tile span { color:var(--muted); font-size:12px; }
+    h2 { font-size:15px; margin:24px 0 4px; }
+    p.sub { margin:0 0 8px; color:var(--muted); }
+    .grid { height:280px; width:100%; }
+    .grid.short { height:220px; }
+    a { color:inherit; }
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1 id="shop">Merchant view</h1><a href="/">Back to the shop</a></div>
+    <span class="mode" id="mode">…</span>
+  </header>
+  <main>
+    <div class="tiles">
+      <div class="tile"><b id="t-orders">0</b><span>orders placed by agents</span></div>
+      <div class="tile"><b id="t-revenue">$0</b><span>paid through PayPal</span></div>
+      <div class="tile"><b id="t-discount">0%</b><span>average discount agreed</span></div>
+      <div class="tile"><b id="t-deals">0</b><span>negotiations with agents</span></div>
+      <div class="tile"><b id="t-missed">0</b><span>things agents wanted that you didn't have</span></div>
+    </div>
+
+    <h2>Orders placed by agents</h2>
+    <p class="sub">Every order here was found, negotiated and started by an AI agent, then approved by a person in PayPal.</p>
+    <div id="orders" class="grid"></div>
+
+    <h2>Negotiations</h2>
+    <p class="sub">Each bid from a buyer's agent and how your shop answered. Your shop never went under your floor.</p>
+    <div id="negs" class="grid"></div>
+
+    <h2>Missed demand</h2>
+    <p class="sub">What agents searched for and couldn't find, and prices they wanted that you turned down. No shop sees this today.</p>
+    <div id="missed" class="grid short"></div>
+
+    <h2>Products and floors</h2>
+    <p class="sub">Double-click a floor to change the lowest price your shop's agent may agree to. Agents never see it.</p>
+    <div id="products" class="grid short"></div>
+  </main>
+
+  <script src="/vendor/ag-grid.js"></script>
+  <script>
+    const SHOP = new URLSearchParams(location.search).get('shop') || 'ikoko';
+    const KEY = new URLSearchParams(location.search).get('key') || '';
+    const q = KEY ? `?key=${encodeURIComponent(KEY)}` : '';
+    const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+    if (agGrid.ModuleRegistry && agGrid.AllCommunityModule) agGrid.ModuleRegistry.registerModules([agGrid.AllCommunityModule]);
+    const theme = agGrid.themeQuartz ? (dark && agGrid.colorSchemeDark ? agGrid.themeQuartz.withPart(agGrid.colorSchemeDark) : agGrid.themeQuartz) : undefined;
+    const usd = (n) => n == null ? '' : new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(n);
+    const time = (s) => s ? new Date(s).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
+    const base = { theme, defaultColDef: { resizable: true, sortable: true, flex: 1, minWidth: 90 }, animateRows: true, getRowId: undefined };
+
+    const orders = agGrid.createGrid(document.getElementById('orders'), { ...base,
+      getRowId: (p) => p.data.orderId,
+      columnDefs: [
+        { field: 'createdAt', headerName: 'Time', valueFormatter: (p) => time(p.value), sort: 'desc', maxWidth: 110 },
+        { field: 'agent', headerName: 'Agent', minWidth: 120 },
+        { field: 'itemsText', headerName: 'Items', minWidth: 160 },
+        { field: 'listTotal', headerName: 'List', valueFormatter: (p) => usd(p.value), maxWidth: 100 },
+        { field: 'total', headerName: 'Agreed', valueFormatter: (p) => usd(p.value), maxWidth: 110, cellStyle: { fontWeight: 600 } },
+        { field: 'discountPct', headerName: 'Discount', valueFormatter: (p) => `${p.value}%`, maxWidth: 100 },
+        { field: 'rounds', headerName: 'Rounds', maxWidth: 90 },
+        { field: 'statusText', headerName: 'Status', maxWidth: 140, cellStyle: (p) => ({ color: p.value === 'paid' ? 'var(--good)' : 'var(--warn)', fontWeight: 600 }) },
+        { field: 'orderId', headerName: 'PayPal order', minWidth: 160 },
+      ],
+    });
+    const negs = agGrid.createGrid(document.getElementById('negs'), { ...base,
+      getRowId: (p) => p.data.id,
+      columnDefs: [
+        { field: 'startedAt', headerName: 'Started', valueFormatter: (p) => time(p.value), sort: 'desc', maxWidth: 110 },
+        { field: 'agent', headerName: 'Agent', maxWidth: 140 },
+        { field: 'items', headerName: 'Cart', minWidth: 140 },
+        { field: 'story', headerName: 'How it went', flex: 3, minWidth: 320, tooltipField: 'story' },
+        { field: 'lastTotal', headerName: 'Last price', valueFormatter: (p) => usd(p.value), maxWidth: 110 },
+      ],
+    });
+    const missed = agGrid.createGrid(document.getElementById('missed'), { ...base,
+      getRowId: (p) => p.data.what,
+      columnDefs: [
+        { field: 'what', headerName: 'What they wanted', flex: 3, minWidth: 220 },
+        { field: 'kind', headerName: 'Type', valueFormatter: (p) => p.value === 'search_miss' ? 'not in stock' : 'price too low', maxWidth: 140 },
+        { field: 'count', headerName: 'Times', sort: 'desc', maxWidth: 90 },
+        { field: 'last', headerName: 'Last asked', valueFormatter: (p) => time(p.value), maxWidth: 120 },
+      ],
+    });
+    const products = agGrid.createGrid(document.getElementById('products'), { ...base,
+      getRowId: (p) => p.data.sku,
+      columnDefs: [
+        { field: 'name', headerName: 'Product', minWidth: 170 },
+        { field: 'price', headerName: 'List price', valueFormatter: (p) => usd(p.value), maxWidth: 120 },
+        { field: 'floor', headerName: 'Your floor', editable: true, valueFormatter: (p) => usd(p.value), valueParser: (p) => Number(p.newValue), maxWidth: 130, cellStyle: { fontWeight: 600 } },
+        { field: 'stock', headerName: 'Stock', maxWidth: 90 },
+      ],
+      onCellValueChanged: async (e) => {
+        const res = await fetch(`/api/merchant/${SHOP}/floor${q}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: e.data.sku, floor: e.newValue }) });
+        if (!res.ok) { alertRow(e, (await res.json()).error); }
+        refresh();
+      },
+    });
+    function alertRow(e, msg) { e.node.setDataValue('floor', e.oldValue); console.warn(msg); }
+
+    const story = (h) => h.map((r) => {
+      const bid = r.bid == null ? 'asked the price' : `bid ${usd(r.bid)}`;
+      const verb = { accepted: 'accepted', counter: 'countered', final: 'final offer', declined: 'declined' }[r.status] || r.status;
+      return `${bid} → ${verb} ${usd(r.total)}`;
+    }).join('  ·  ');
+
+    async function refresh() {
+      const res = await fetch(`/api/merchant/${SHOP}${q}`);
+      if (!res.ok) return;
+      const v = await res.json();
+      document.getElementById('shop').textContent = v.shop.name;
+      document.title = `${v.shop.name}: merchant view`;
+      document.getElementById('mode').textContent = v.shop.paypalMode === 'sandbox' ? 'PayPal sandbox' : 'Mock checkout (no PayPal account)';
+      const rows = v.orders.map((o) => ({
+        ...o,
+        itemsText: o.items.map((i) => `${i.qty}× ${i.name}`).join(', '),
+        discountPct: o.listTotal ? Math.round((1 - o.total / o.listTotal) * 100) : 0,
+        statusText: o.status === 'COMPLETED' ? 'paid' : 'awaiting approval',
+      }));
+      orders.setGridOption('rowData', rows);
+      negs.setGridOption('rowData', v.negotiations.map((n) => ({ ...n, story: story(n.history) })));
+      missed.setGridOption('rowData', v.missedDemand);
+      if (!products.getEditingCells().length) products.setGridOption('rowData', v.products);
+      const paid = rows.filter((r) => r.statusText === 'paid');
+      document.getElementById('t-orders').textContent = rows.length;
+      document.getElementById('t-revenue').textContent = usd(paid.reduce((s, r) => s + r.total, 0));
+      document.getElementById('t-discount').textContent = `${rows.length ? Math.round(rows.reduce((s, r) => s + r.discountPct, 0) / rows.length) : 0}%`;
+      document.getElementById('t-deals').textContent = v.negotiations.length;
+      document.getElementById('t-missed').textContent = v.missedDemand.reduce((s, m) => s + m.count, 0);
+    }
+    refresh();
+    setInterval(refresh, 3000);
+  </script>
+</body>
+</html>
