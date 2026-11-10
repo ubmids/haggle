@@ -15,7 +15,8 @@ const MAX_BIDS = 3;
 const NUMBER_WORDS = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, pair: 2, couple: 2 };
 const STOP = new Set(['buy', 'me', 'get', 'find', 'a', 'an', 'the', 'as', 'gift', 'for', 'my', 'and', 'try', 'to', 'keep',
   'it', 'under', 'below', 'less', 'than', 'max', 'budget', 'is', 'of', 'some', 'please', 'want', 'i', 'need', 'pair', 'couple',
-  'with', 'total', 'at', 'most', 'up', 'spend', 'no', 'more', 'cheap', 'good', 'deal', 'one', 'two', 'three', 'four', 'five', 'six']);
+  'with', 'total', 'at', 'most', 'up', 'spend', 'no', 'more', 'cheap', 'good', 'deal', 'one', 'two', 'three', 'four', 'five', 'six',
+  'best', 'price', 'prices', 'cheapest', 'lowest', 'can', 'you', 'could', 'get', 'show', 'looking', 'something', 'nice', 'office', 'home', 'gifts', 'present', 'possible', 'that', 'this', 'them', 'some', 'any', 'please']);
 
 /** "Buy me two green mugs as a gift, keep it under $30" -> { query: 'green mug', qty: 2, budget: 30 } */
 export function parseGoal(goal) {

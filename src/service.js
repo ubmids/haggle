@@ -165,6 +165,7 @@ export function createService({ shops, paypal, shopAgent, now = () => Date.now()
       listTotal: rec.listTotal,
       savings: Math.round((rec.listTotal - rec.total) * 100) / 100,
       currency: rec.currency,
+      items: rec.items,
       approveUrl: rec.approveUrl,
       message: 'The buyer now approves this payment in PayPal. The agent cannot pay on their behalf. Call check_order after they approve.',
     };

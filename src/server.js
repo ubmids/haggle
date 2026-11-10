@@ -14,7 +14,10 @@ const PUBLIC = path.join(here, '..', 'public');
 
 export function createApp({ env = process.env, shops = structuredClone(SHOPS), paypal, shopAgent, buyerAgent } = {}) {
   // On Vercel the production address is known without setting PUBLIC_URL.
-  const vercelUrl = env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}` : '';
+  // On Vercel, production uses the project's production domain and previews use their own URL,
+  // so PayPal's return link comes back to the deployment that holds the order.
+  const vercelHost = env.VERCEL_ENV === 'production' ? env.VERCEL_PROJECT_PRODUCTION_URL : env.VERCEL_URL;
+  const vercelUrl = vercelHost ? `https://${vercelHost}` : '';
   const publicUrl = (env.PUBLIC_URL || vercelUrl).replace(/\/$/, '');
   paypal ??= createPayPal({
     mode: env.PAYPAL_MODE,

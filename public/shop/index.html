@@ -4,65 +4,97 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!--ORIGIN_TRIAL-->
-  <title>Ìkòkò Clay Studio</title>
-  <meta name="description" content="Handmade stoneware from a two-person studio in Lagos.">
-  <style>
-    :root { --bg:#faf6f0; --ink:#2a2118; --muted:#7a6f61; --line:#e8e0d4; --card:#fff; --accent:#a9552d; }
-    @media (prefers-color-scheme: dark) { :root { --bg:#181512; --ink:#f2ede6; --muted:#a89d8f; --line:#2f2a24; --card:#211d19; --accent:#e08a5c; } }
-    * { box-sizing: border-box; }
-    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 Georgia, 'Iowan Old Style', serif; }
-    header { padding:28px 16px 8px; max-width:1040px; margin:0 auto; display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; }
-    h1 { margin:0; font-size:clamp(26px,4vw,38px); font-weight:normal; letter-spacing:-.01em; }
-    .tag { color:var(--muted); font-style:italic; }
-    nav a { color:var(--ink); margin-left:16px; font-family:system-ui, sans-serif; font-size:14px; }
-    main { max-width:1040px; margin:0 auto; padding:16px; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; }
-    .card { background:var(--card); border:1px solid var(--line); border-radius:6px; overflow:hidden; }
-    .card img { display:block; width:100%; aspect-ratio:1; object-fit:cover; }
-    .card div { padding:12px 14px 16px; }
-    .card h2 { font-size:17px; margin:0 0 2px; font-weight:normal; }
-    .card p { margin:0; color:var(--muted); font-size:14px; }
-    .price { font-family:system-ui, sans-serif; font-weight:600; margin-top:8px; }
-    .price small { color:var(--muted); font-weight:normal; }
-    .demo { max-width:1040px; margin:4px auto 8px; padding:12px 16px; font:14px/1.4 system-ui, -apple-system, sans-serif; }
-    .demo-in { border:1px dashed var(--line); border-radius:8px; padding:12px 14px; background:var(--card); }
-    .demo form { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
-    .demo input { flex:1 1 260px; min-width:0; font:inherit; padding:9px 10px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); }
-    .demo button { font:inherit; font-weight:600; padding:9px 14px; border:0; border-radius:6px; background:var(--accent); color:#fff; cursor:pointer; }
-    .demo button:disabled { opacity:.6; cursor:progress; }
-    .demo ol { margin:10px 0 0; padding-left:20px; color:var(--muted); }
-    .demo li.db-done { color:var(--ink); font-weight:600; }
-    .demo li.db-error { color:#b42318; }
-    .demo .db-label { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
-    footer { max-width:1040px; margin:32px auto; padding:16px; color:var(--muted); font-size:14px; border-top:1px solid var(--line); }
-  </style>
+  <title>Ìkòkò Clay Studio · haggle demo</title>
+  <meta name="description" content="A demo shop that AI agents can browse, haggle with and check out through PayPal, added with one script tag.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shop/shop.css">
 </head>
 <body>
-  <header>
-    <div>
-      <h1>Ìkòkò Clay Studio</h1>
-      <div class="tag">Handmade stoneware from Yaba, Lagos.</div>
+  <!-- Demo frame: explains the demo. Not part of the shop. -->
+  <div class="demobar" role="note">
+    <div class="demobar-in">
+      <a class="hg-mark" href="#how" aria-label="haggle: how it works"><span class="hg-logo" aria-hidden="true"></span>haggle</a>
+      <p>Live demo. This shop added <b>one line of code</b>, and now AI agents can shop it, haggle and check out with PayPal.</p>
+      <a class="demobar-link" href="/merchant/">Merchant view <span aria-hidden="true">→</span></a>
     </div>
-    <nav><a href="/merchant">Merchant view</a></nav>
-  </header>
-  <section class="demo" id="demo-buyer" aria-label="Demo buyer agent">
-    <div class="demo-in">
-      <div class="db-label">Demo, not part of the shop</div>
-      <div class="db-lead">No AI agent in your browser yet? Watch one shop here:</div>
-      <form>
-        <input type="text" value="Buy two green mugs as a gift, keep it under $30" aria-label="What should the agent buy?" maxlength="200">
-        <button type="submit">Watch an agent buy</button>
+  </div>
+
+  <div class="page">
+    <!-- The shop: an ordinary page with no AI in it. -->
+    <div class="shop">
+      <header class="shop-head">
+        <a class="brand" href="/">Ìkòkò <span>Clay Studio</span></a>
+        <nav aria-label="Shop">
+          <a href="#shop">Shop</a>
+          <a href="#studio">Studio</a>
+          <span class="cart" aria-live="polite">Cart (<b id="cart-count">0</b>)</span>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">New this month: hand-stamped adire mugs</p>
+        <h1>Made by hand in Yaba.<br>Fired twice, used every day.</h1>
+        <p class="lede">Small batches of stoneware from a two-person studio in Lagos. Every piece is thrown, glazed and fired here, and ships worldwide.</p>
+      </section>
+
+      <main id="shop">
+        <div class="grid" id="products"></div>
+      </main>
+
+      <section class="studio" id="studio">
+        <h2>The studio</h2>
+        <p>Ìkòkò means clay pot in Yorùbá. We dig some of our clay in Ogun State, mix it with stoneware from abroad, and glaze in colours from home: moss, indigo, ochre and ash.</p>
+      </section>
+
+      <footer class="shop-foot">
+        <span>© Ìkòkò Clay Studio, Lagos</span>
+        <span>Free shipping in Lagos over $50</span>
+      </footer>
+    </div>
+
+    <!-- Demo only: a buyer agent for browsers without one. -->
+    <aside class="console" id="demo-buyer" aria-label="Demo buyer agent">
+      <div class="console-head">
+        <div class="avatar" aria-hidden="true"></div>
+        <div>
+          <div class="console-title">Buyer agent</div>
+          <div class="console-sub" id="db-lead">Stands in for ChatGPT's or Chrome's agent. It shops this page with the same tools they would.</div>
+        </div>
+      </div>
+      <form class="goal">
+        <label for="db-goal">Ask it to buy something</label>
+        <div class="goal-row">
+          <input id="db-goal" type="text" value="Buy two green mugs as a gift, keep it under $30" maxlength="200" autocomplete="off">
+          <button type="submit">Watch it shop</button>
+        </div>
+        <div class="chips" aria-label="Examples">
+          <button type="button" data-goal="Buy two green mugs as a gift, keep it under $30">Two green mugs under $30</button>
+          <button type="button" data-goal="Buy three sand speckle mugs, the best price you can get">Three mugs, bundle price</button>
+          <button type="button" data-goal="Find me a blue teapot under $40">A blue teapot</button>
+        </div>
       </form>
-      <ol hidden></ol>
-    </div>
-  </section>
-  <main>
-    <div class="grid" id="products"></div>
-  </main>
-  <footer>
-    This is a plain shop page with no AI in it. The only change is one script tag at the bottom.
-    PayPal sandbox only: no real money moves.
-  </footer>
+
+      <div class="deal" id="db-deal" hidden>
+        <div class="deal-row"><span>List price</span><b id="db-list">$0.00</b></div>
+        <div class="deal-row"><span>On the table</span><b id="db-now">$0.00</b></div>
+        <div class="meter"><span id="db-meter"></span></div>
+      </div>
+
+      <ol class="transcript" id="db-log" aria-live="polite"></ol>
+
+      <div class="how" id="how">
+        <div class="how-title">How it works</div>
+        <ol>
+          <li><b>The agent finds it.</b> The shop's one script tag gives agents five tools: search, look, ask for a price, accept, check the order.</li>
+          <li><b>The two agents haggle.</b> The shop's agent counters and offers bundle deals, but never goes under the merchant's hidden floor price.</li>
+          <li><b>You approve in PayPal.</b> The agent can start a checkout but can't pay. Only you can.</li>
+        </ol>
+        <pre class="snippet"><code>&lt;script src="https://…/haggle.js" data-shop="ikoko"&gt;&lt;/script&gt;</code></pre>
+      </div>
+    </aside>
+  </div>
 
   <script>
     // An ordinary product grid. Nothing here knows about agents.
@@ -75,10 +107,22 @@
       ['vase-ochre', 'Ochre bud vase', 'One stem, drip glaze', 34],
     ];
     document.getElementById('products').innerHTML = items.map(([sku, name, blurb, price]) => `
-      <article class="card">
-        <img src="/shop/img/${sku}.svg" alt="${name}" width="250" height="250">
-        <div><h2>${name}</h2><p>${blurb}</p><div class="price">$${price} <small>USD</small></div></div>
+      <article class="card" data-sku="${sku}">
+        <div class="ph"><img src="/shop/img/${sku}.svg" alt="${name}" width="400" height="400" loading="lazy"></div>
+        <div class="card-body">
+          <div class="card-top"><h2>${name}</h2><span class="price">$${price}</span></div>
+          <p>${blurb}</p>
+          <button type="button" class="add">Add to cart</button>
+        </div>
       </article>`).join('');
+    let count = 0;
+    document.getElementById('products').addEventListener('click', (e) => {
+      const b = e.target.closest('.add');
+      if (!b) return;
+      document.getElementById('cart-count').textContent = ++count;
+      b.textContent = 'Added';
+      setTimeout(() => (b.textContent = 'Add to cart'), 1200);
+    });
   </script>
 
   <!-- The one line -->

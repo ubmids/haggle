@@ -70,7 +70,7 @@ test('without WebMCP it still exposes window.haggle and says WebMCP is off', asy
   const { window, registry } = await loadPage({ withWebMCP: false });
   assert.equal(registry.size, 0);
   assert.equal(window.haggle.webmcp, false);
-  assert.match(window.document.querySelector('.hg-label').textContent, /WebMCP off/);
+  assert.match(window.document.querySelector('.hg-pill').textContent, /WebMCP off/);
   const r = await window.haggle.call('search_products', { query: 'vase' });
   assert.equal(r.results[0].sku, 'vase-ochre');
 });

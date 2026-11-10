@@ -4,55 +4,91 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Merchant view</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg:#f7f4ef; --ink:#221d17; --muted:#766b5d; --card:#fff; --line:#e6dfd4; --good:#1f7a45; --warn:#9a5b00; }
-    @media (prefers-color-scheme: dark) { :root { --bg:#151310; --ink:#f0ebe4; --muted:#a69a8b; --card:#1e1b17; --line:#322c26; --good:#4fc184; --warn:#e2a64a; } }
+    :root { --bg:#f7f2ea; --ink:#221b14; --muted:#776b5c; --card:#fffdf9; --line:#e7ded1; --soft:#efe6d9; --accent:#b2552b; --good:#1e7a47; --warn:#9a5b00;
+      --shadow:0 1px 2px rgba(34,27,20,.04), 0 8px 24px rgba(34,27,20,.05); }
+    @media (prefers-color-scheme: dark) { :root { --bg:#15120f; --ink:#f2ece4; --muted:#a99d8e; --card:#1d1915; --line:#2f2923; --soft:#26211c; --accent:#e0875a; --good:#5cc98b; --warn:#e2a64a; --shadow:0 1px 2px rgba(0,0,0,.3); } }
     * { box-sizing:border-box; }
-    body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif; }
-    header { max-width:1200px; margin:0 auto; padding:20px 16px 8px; display:flex; flex-wrap:wrap; gap:8px 16px; align-items:baseline; justify-content:space-between; }
-    h1 { margin:0; font-size:22px; }
-    .mode { font-size:12px; padding:2px 8px; border-radius:999px; background:#fff3cd; color:#6b4e00; }
-    main { max-width:1200px; margin:0 auto; padding:8px 16px 40px; }
-    .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin:8px 0 20px; }
-    .tile { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
-    .tile b { display:block; font-size:24px; font-variant-numeric:tabular-nums; }
-    .tile span { color:var(--muted); font-size:12px; }
-    h2 { font-size:15px; margin:24px 0 4px; }
-    p.sub { margin:0 0 8px; color:var(--muted); }
-    .grid { height:280px; width:100%; }
-    .grid.short { height:220px; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; }
     a { color:inherit; }
+    .topbar { background:#1b1612; color:#efe7dc; }
+    .topbar-in { max-width:1200px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:14px; font-size:13.5px; }
+    .hg-mark { display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:15px; color:#fff; text-decoration:none; }
+    .hg-logo { width:18px; height:18px; border-radius:5px; background:conic-gradient(from 210deg,#ffc439,#e0875a,#b2552b,#ffc439); }
+    .topbar span.crumb { color:#c9bdad; flex:1; }
+    .topbar a.btn { white-space:nowrap; text-decoration:none; font-weight:500; color:#fff; padding:5px 12px; border:1px solid #4a4036; border-radius:999px; }
+    .topbar a.btn:hover { background:#2a231d; }
+    header { max-width:1200px; margin:0 auto; padding:28px 16px 6px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:flex-end; justify-content:space-between; }
+    .kicker { font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+    h1 { margin:2px 0 0; font:500 30px/1.15 'Fraunces',Georgia,serif; letter-spacing:-.01em; }
+    .mode { font-size:12.5px; font-weight:500; padding:5px 11px; border-radius:999px; background:#fff3cd; color:#6b4e00; display:inline-flex; align-items:center; gap:6px; }
+    .mode::before { content:''; width:7px; height:7px; border-radius:50%; background:currentColor; }
+    @media (prefers-color-scheme: dark) { .mode { background:#3a2e12; color:#f1cf7c; } }
+    main { max-width:1200px; margin:0 auto; padding:8px 16px 48px; }
+    .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin:18px 0 8px; }
+    .tile { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow); }
+    .tile b { display:block; font-size:28px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums; }
+    .tile span { color:var(--muted); font-size:12.5px; }
+    .tile.hl b { color:var(--good); }
+    .tile.miss b { color:var(--accent); }
+    section.panel { margin-top:22px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px 16px 14px; box-shadow:var(--shadow); }
+    h2 { font-size:16px; font-weight:600; margin:0 0 2px; }
+    p.sub { margin:0 0 12px; color:var(--muted); font-size:13.5px; }
+    .grid { height:260px; width:100%; }
+    .grid.short { height:220px; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:0 18px; }
+    .two section.panel { margin-top:22px; }
+    @media (max-width:900px) { .two { grid-template-columns:1fr; } }
+    @media (max-width:560px) { .topbar span.crumb { display:none; } .topbar-in { justify-content:space-between; } h1 { font-size:24px; } }
   </style>
 </head>
 <body>
+  <div class="topbar"><div class="topbar-in">
+    <a class="hg-mark" href="/"><span class="hg-logo" aria-hidden="true"></span>haggle</a>
+    <span class="crumb">Merchant view: what agents did in your shop</span>
+    <a class="btn" href="/">Open the shop <span aria-hidden="true">→</span></a>
+  </div></div>
   <header>
-    <div><h1 id="shop">Merchant view</h1><a href="/">Back to the shop</a></div>
+    <div><div class="kicker">Merchant view</div><h1 id="shop">Your shop</h1></div>
     <span class="mode" id="mode">…</span>
   </header>
   <main>
     <div class="tiles">
       <div class="tile"><b id="t-orders">0</b><span>orders placed by agents</span></div>
-      <div class="tile"><b id="t-revenue">$0</b><span>paid through PayPal</span></div>
+      <div class="tile hl"><b id="t-revenue">$0</b><span>paid through PayPal</span></div>
       <div class="tile"><b id="t-discount">0%</b><span>average discount agreed</span></div>
       <div class="tile"><b id="t-deals">0</b><span>negotiations with agents</span></div>
-      <div class="tile"><b id="t-missed">0</b><span>things agents wanted that you didn't have</span></div>
+      <div class="tile miss"><b id="t-missed">0</b><span>things agents wanted that you didn't have</span></div>
     </div>
 
+    <section class="panel">
     <h2>Orders placed by agents</h2>
     <p class="sub">Every order here was found, negotiated and started by an AI agent, then approved by a person in PayPal.</p>
     <div id="orders" class="grid"></div>
+    </section>
 
+    <section class="panel">
     <h2>Negotiations</h2>
     <p class="sub">Each bid from a buyer's agent and how your shop answered. Your shop never went under your floor.</p>
     <div id="negs" class="grid"></div>
+    </section>
 
+    <div class="two">
+    <section class="panel">
     <h2>Missed demand</h2>
     <p class="sub">What agents searched for and couldn't find, and prices they wanted that you turned down. No shop sees this today.</p>
     <div id="missed" class="grid short"></div>
+    </section>
 
+    <section class="panel">
     <h2>Products and floors</h2>
     <p class="sub">Double-click a floor to change the lowest price your shop's agent may agree to. Agents never see it.</p>
     <div id="products" class="grid short"></div>
+    </section>
+    </div>
   </main>
 
   <script src="/vendor/ag-grid.js"></script>
@@ -65,9 +101,11 @@
     const theme = agGrid.themeQuartz ? (dark && agGrid.colorSchemeDark ? agGrid.themeQuartz.withPart(agGrid.colorSchemeDark) : agGrid.themeQuartz) : undefined;
     const usd = (n) => n == null ? '' : new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(n);
     const time = (s) => s ? new Date(s).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
+    const empty = (t) => `<span style="color:var(--muted)">${t}</span>`;
     const base = { theme, defaultColDef: { resizable: true, sortable: true, flex: 1, minWidth: 90 }, animateRows: true, getRowId: undefined };
 
     const orders = agGrid.createGrid(document.getElementById('orders'), { ...base,
+      overlayNoRowsTemplate: empty('No agent orders yet. Open the shop and press “Watch it shop”.'),
       getRowId: (p) => p.data.orderId,
       columnDefs: [
         { field: 'createdAt', headerName: 'Time', valueFormatter: (p) => time(p.value), sort: 'desc', maxWidth: 110 },
@@ -82,6 +120,7 @@
       ],
     });
     const negs = agGrid.createGrid(document.getElementById('negs'), { ...base,
+      overlayNoRowsTemplate: empty('No negotiations yet.'),
       getRowId: (p) => p.data.id,
       columnDefs: [
         { field: 'startedAt', headerName: 'Started', valueFormatter: (p) => time(p.value), sort: 'desc', maxWidth: 110 },
@@ -92,12 +131,13 @@
       ],
     });
     const missed = agGrid.createGrid(document.getElementById('missed'), { ...base,
+      overlayNoRowsTemplate: empty('Nothing missed yet. Try asking the agent for a blue teapot.'),
       getRowId: (p) => p.data.what,
       columnDefs: [
-        { field: 'what', headerName: 'What they wanted', flex: 3, minWidth: 220 },
-        { field: 'kind', headerName: 'Type', valueFormatter: (p) => p.value === 'search_miss' ? 'not in stock' : 'price too low', maxWidth: 140 },
-        { field: 'count', headerName: 'Times', sort: 'desc', maxWidth: 90 },
-        { field: 'last', headerName: 'Last asked', valueFormatter: (p) => time(p.value), maxWidth: 120 },
+        { field: 'what', headerName: 'What they wanted', flex: 3, minWidth: 170, tooltipField: 'what' },
+        { field: 'kind', headerName: 'Type', valueFormatter: (p) => p.value === 'search_miss' ? 'not in stock' : 'price too low', minWidth: 110, maxWidth: 130 },
+        { field: 'count', headerName: 'Times', sort: 'desc', minWidth: 80, maxWidth: 90 },
+        { field: 'last', headerName: 'Last asked', valueFormatter: (p) => time(p.value), minWidth: 110, maxWidth: 120 },
       ],
     });
     const products = agGrid.createGrid(document.getElementById('products'), { ...base,
