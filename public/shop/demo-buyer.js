@@ -30,8 +30,13 @@
     li.append(el('span', 'who', who ?? (side === 'buyer' ? 'Buyer agent' : "Shop's agent")), el('div', 'bubble', text));
     if (tool) li.append(tool);
     log.append(li);
-    li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    follow();
     return li;
+  }
+
+  // Keep the newest line in view inside the console, without scrolling the page.
+  function follow() {
+    if (box.scrollHeight > box.clientHeight) box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
   }
 
   function typing(side) {
@@ -40,15 +45,19 @@
     b.append(el('i'), el('i'), el('i'));
     li.append(b);
     log.append(li);
-    li.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    follow();
     return li;
   }
+
+  const fmt = (v) => Array.isArray(v) ? `[${v.map(fmt).join(', ')}]`
+    : v && typeof v === 'object' ? `{ ${Object.entries(v).map(([k, x]) => `${k}: ${fmt(x)}`).join(', ')} }`
+    : JSON.stringify(v);
 
   function toolLine(name, args) {
     const shown = Object.fromEntries(Object.entries(args ?? {}).filter(([k]) => k !== 'message' && k !== 'negotiation_id'));
     const line = el('div', 'tool');
     const b = el('b', '', name);
-    line.append(b, document.createTextNode(`(${JSON.stringify(shown).replace(/"(\w+)":/g, '$1: ')})`));
+    line.append(b, document.createTextNode(`(${fmt(shown)})`));
     return line;
   }
 
@@ -82,7 +91,7 @@
     }
     if (action === 'accept_offer') {
       showDeal(result.listTotal, result.total, true);
-      return message('shop', `Deal at ${money(result.total)}. You save ${money(result.savings)}. Approve it in PayPal to finish.`, { who: 'Shop', kind: 'done' });
+      return null;
     }
     return null;
   }

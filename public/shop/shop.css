@@ -70,10 +70,10 @@ button { font: inherit; cursor: pointer; }
 .console-title { font-weight: 600; font-size: 15px; }
 .console-sub { color: var(--muted); font-size: 13px; line-height: 1.45; }
 .goal label { display: block; font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
-.goal-row { display: flex; gap: 8px; }
+.goal-row { display: flex; flex-direction: column; gap: 8px; }
 .goal input { flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); font: inherit; font-size: 14px; }
 .goal input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-.goal-row button { flex: none; padding: 10px 14px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 14px; }
+.goal-row button { flex: none; padding: 11px 14px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 14px; }
 .goal-row button:disabled { opacity: .55; cursor: progress; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .chips button { padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font-size: 12.5px; }
@@ -113,7 +113,7 @@ button { font: inherit; cursor: pointer; }
 .how-title { font-weight: 600; color: var(--ink); font-size: 13px; margin-bottom: 8px; }
 .how ol { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
 .how b { color: var(--ink); font-weight: 600; }
-.snippet { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: #1b1612; color: #f3d9a8; font: 11.5px/1.5 var(--mono); white-space: pre-wrap; word-break: break-all; }
+.snippet { margin: 12px 0 0; padding: 10px 12px; border-radius: 10px; background: #1b1612; color: #f3d9a8; font: 11.5px/1.5 var(--mono); white-space: pre; overflow-x: auto; }
 .console.running .how { display: none; }
 
 @media (max-width: 960px) {
@@ -126,7 +126,6 @@ button { font: inherit; cursor: pointer; }
   .demobar p { order: 3; flex-basis: 100%; }
   .demobar-in .demobar-link { margin-left: auto; }
   .shop-head nav a { display: none; }
-  .goal-row { flex-direction: column; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .card-body { padding: 10px 12px 12px; }
   .card-top { flex-direction: column; gap: 2px; }
