@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--ORIGIN_TRIAL-->
+  <title>Ìkòkò Clay Studio</title>
+  <meta name="description" content="Handmade stoneware from a two-person studio in Lagos.">
+  <style>
+    :root { --bg:#faf6f0; --ink:#2a2118; --muted:#7a6f61; --line:#e8e0d4; --card:#fff; --accent:#a9552d; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#181512; --ink:#f2ede6; --muted:#a89d8f; --line:#2f2a24; --card:#211d19; --accent:#e08a5c; } }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 Georgia, 'Iowan Old Style', serif; }
+    header { padding:28px 16px 8px; max-width:1040px; margin:0 auto; display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; }
+    h1 { margin:0; font-size:clamp(26px,4vw,38px); font-weight:normal; letter-spacing:-.01em; }
+    .tag { color:var(--muted); font-style:italic; }
+    nav a { color:var(--ink); margin-left:16px; font-family:system-ui, sans-serif; font-size:14px; }
+    main { max-width:1040px; margin:0 auto; padding:16px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+    .card img { display:block; width:100%; aspect-ratio:1; object-fit:cover; }
+    .card div { padding:12px 14px 16px; }
+    .card h2 { font-size:17px; margin:0 0 2px; font-weight:normal; }
+    .card p { margin:0; color:var(--muted); font-size:14px; }
+    .price { font-family:system-ui, sans-serif; font-weight:600; margin-top:8px; }
+    .price small { color:var(--muted); font-weight:normal; }
+    footer { max-width:1040px; margin:32px auto; padding:16px; color:var(--muted); font-size:14px; border-top:1px solid var(--line); }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Ìkòkò Clay Studio</h1>
+      <div class="tag">Handmade stoneware from Yaba, Lagos.</div>
+    </div>
+    <nav><a href="/merchant">Merchant view</a></nav>
+  </header>
+  <main>
+    <div class="grid" id="products"></div>
+  </main>
+  <footer>
+    This is a plain shop page with no AI in it. The only change is one script tag at the bottom.
+    PayPal sandbox only: no real money moves.
+  </footer>
+
+  <script>
+    // An ordinary product grid. Nothing here knows about agents.
+    const items = [
+      ['mug-green', 'Moss green mug', 'Stoneware mug, 350 ml', 18],
+      ['mug-indigo', 'Indigo adire mug', 'Hand-stamped adire pattern', 22],
+      ['mug-sand', 'Sand speckle mug', '300 ml, fits a pour-over', 16],
+      ['bowl-terracotta', 'Terracotta soup bowl', 'Wide, for egusi or ramen', 26],
+      ['plate-ash', 'Ash dinner plate', '27 cm, matte ash glaze', 30],
+      ['vase-ochre', 'Ochre bud vase', 'One stem, drip glaze', 34],
+    ];
+    document.getElementById('products').innerHTML = items.map(([sku, name, blurb, price]) => `
+      <article class="card">
+        <img src="/shop/img/${sku}.svg" alt="${name}" width="250" height="250">
+        <div><h2>${name}</h2><p>${blurb}</p><div class="price">$${price} <small>USD</small></div></div>
+      </article>`).join('');
+  </script>
+
+  <!-- The one line -->
+  <script src="/haggle.js" data-shop="ikoko" defer></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# One-click host on Render. Secrets are set in Render's dashboard, never in this file.
+services:
+  - type: web
+    name: haggle
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: PUBLIC_URL
+        sync: false
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: WEBMCP_OT_TOKEN
+        sync: false
+      - key: MERCHANT_KEY
+        sync: false
