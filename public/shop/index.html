@@ -24,6 +24,16 @@
     .card p { margin:0; color:var(--muted); font-size:14px; }
     .price { font-family:system-ui, sans-serif; font-weight:600; margin-top:8px; }
     .price small { color:var(--muted); font-weight:normal; }
+    .demo { max-width:1040px; margin:4px auto 8px; padding:12px 16px; font:14px/1.4 system-ui, -apple-system, sans-serif; }
+    .demo-in { border:1px dashed var(--line); border-radius:8px; padding:12px 14px; background:var(--card); }
+    .demo form { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+    .demo input { flex:1 1 260px; min-width:0; font:inherit; padding:9px 10px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); }
+    .demo button { font:inherit; font-weight:600; padding:9px 14px; border:0; border-radius:6px; background:var(--accent); color:#fff; cursor:pointer; }
+    .demo button:disabled { opacity:.6; cursor:progress; }
+    .demo ol { margin:10px 0 0; padding-left:20px; color:var(--muted); }
+    .demo li.db-done { color:var(--ink); font-weight:600; }
+    .demo li.db-error { color:#b42318; }
+    .demo .db-label { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
     footer { max-width:1040px; margin:32px auto; padding:16px; color:var(--muted); font-size:14px; border-top:1px solid var(--line); }
   </style>
 </head>
@@ -35,6 +45,17 @@
     </div>
     <nav><a href="/merchant">Merchant view</a></nav>
   </header>
+  <section class="demo" id="demo-buyer" aria-label="Demo buyer agent">
+    <div class="demo-in">
+      <div class="db-label">Demo, not part of the shop</div>
+      <div class="db-lead">No AI agent in your browser yet? Watch one shop here:</div>
+      <form>
+        <input type="text" value="Buy two green mugs as a gift, keep it under $30" aria-label="What should the agent buy?" maxlength="200">
+        <button type="submit">Watch an agent buy</button>
+      </form>
+      <ol hidden></ol>
+    </div>
+  </section>
   <main>
     <div class="grid" id="products"></div>
   </main>
@@ -62,5 +83,8 @@
 
   <!-- The one line -->
   <script src="/haggle.js" data-shop="ikoko" defer></script>
+
+  <!-- Demo only: a buyer agent for browsers without one -->
+  <script src="/shop/demo-buyer.js" defer></script>
 </body>
 </html>

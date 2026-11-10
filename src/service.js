@@ -37,19 +37,26 @@ export function createService({ shops, paypal, shopAgent, now = () => Date.now()
       return t.length === 0 || t.every((w) => hay.includes(w));
     });
     // Fall back to any-term matches so "green cup" still finds a green mug.
+    let match = hits.length ? 'exact' : 'none';
     if (hits.length === 0 && t.length > 1) {
       hits = s.catalog.filter((p) => t.some((w) => terms(`${p.name} ${p.color} ${p.kind}`).includes(w)));
+      if (hits.length) match = 'close';
     }
     if (maxPrice !== undefined && maxPrice !== null && maxPrice !== '') {
       hits = hits.filter((p) => p.price <= Number(maxPrice) * 1.0001);
     }
     const results = hits.map((p) => publicProduct(p, s.currency));
-    log({ type: results.length ? 'search' : 'search_miss', shopId, query: String(query ?? ''), maxPrice: maxPrice ?? null, results: results.length, agent: agent ?? null });
+    if (!results.length) match = 'none';
+    // A close match still means the shop didn't have what was asked for: count it as missed demand.
+    log({ type: match === 'exact' ? 'search' : 'search_miss', shopId, query: String(query ?? ''), maxPrice: maxPrice ?? null, results: results.length, agent: agent ?? null });
     return {
       results,
-      note: results.length
+      match,
+      note: match === 'exact'
         ? 'Prices are list prices. Use request_offer to ask the shop for a deal before checkout.'
-        : 'Nothing matched. The shop has been told what you looked for.',
+        : match === 'close'
+          ? 'No exact match. These share some of your words; check they are what the shopper wants. The shop has been told what you looked for.'
+          : 'Nothing matched. The shop has been told what you looked for.',
     };
   }
 
