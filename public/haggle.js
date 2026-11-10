@@ -17,6 +17,7 @@
   const API = new URL(script?.src ?? '/haggle.js', location.href).origin;
   const SHOP = script?.dataset.shop ?? 'ikoko';
   const AGENT_LABEL = script?.dataset.agentLabel; // optional: lets a demo name its agent
+  const FEED_CLOSED = script?.dataset.feed === 'closed'; // optional: keep the activity feed shut until clicked
   const modelContext = document.modelContext ?? navigator.modelContext ?? null;
 
   // ---- Talking to the haggle server ---------------------------------------
@@ -167,25 +168,35 @@
   // ---- What the shopper sees ---------------------------------------------------
 
   const css = `
-  .hg-badge{position:fixed;right:16px;bottom:16px;z-index:2147483000;font:13px/1.35 system-ui,-apple-system,Segoe UI,sans-serif;color:#1d1a16}
-  .hg-pill{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e6e0d6;border-radius:999px;padding:8px 14px;box-shadow:0 4px 18px rgba(0,0,0,.08);cursor:pointer}
-  .hg-dot{width:8px;height:8px;border-radius:50%;background:${registered ? '#1f9d55' : '#c08a1e'}}
-  .hg-feed{margin-bottom:8px;background:#fff;border:1px solid #e6e0d6;border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,.10);width:min(320px,calc(100vw - 32px));max-height:40vh;overflow:auto;display:none}
+  .hg-badge{position:fixed;right:16px;bottom:16px;z-index:2147483000;font:13px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;color:#1d1a16;display:flex;flex-direction:column;align-items:flex-end}
+  .hg-pill{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e6e0d6;border-radius:999px;padding:7px 13px 7px 11px;box-shadow:0 4px 18px rgba(0,0,0,.08);cursor:pointer;font-weight:500}
+  .hg-pill small{font-weight:400;color:#7a6f61}
+  .hg-dot{width:8px;height:8px;border-radius:50%;background:${registered ? '#1f9d55' : '#c08a1e'};box-shadow:0 0 0 3px ${registered ? 'rgba(31,157,85,.18)' : 'rgba(192,138,30,.18)'}}
+  .hg-feed{margin-bottom:8px;background:#fff;border:1px solid #e6e0d6;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.10);width:min(320px,calc(100vw - 32px));max-height:40vh;overflow:auto;display:none}
   .hg-feed.open{display:block}
-  .hg-feed h4{margin:0;padding:10px 12px;border-bottom:1px solid #f0ebe3;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#7a6f61}
-  .hg-row{padding:8px 12px;border-bottom:1px solid #f6f2ec}
+  .hg-feed h4{margin:0;padding:10px 14px;border-bottom:1px solid #f0ebe3;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7a6f61}
+  .hg-row{padding:8px 14px;border-bottom:1px solid #f6f2ec}
+  .hg-row:last-child{border-bottom:0}
   .hg-row.pending{color:#7a6f61}.hg-row.error{color:#b42318}
-  .hg-sheet{position:fixed;inset:auto 0 0 0;z-index:2147483001;background:#fff;border-top:1px solid #e6e0d6;box-shadow:0 -12px 40px rgba(0,0,0,.15);padding:20px 16px 24px;font:15px/1.4 system-ui,-apple-system,Segoe UI,sans-serif;color:#1d1a16;animation:hg-up .25s ease-out}
-  @keyframes hg-up{from{transform:translateY(100%)}to{transform:none}}
-  .hg-sheet-in{max-width:460px;margin:0 auto}
-  .hg-sheet h3{margin:0 0 4px;font-size:18px}
-  .hg-was{text-decoration:line-through;color:#8a8073;margin-left:6px}
-  .hg-save{color:#1f7a45;font-weight:600}
-  .hg-close{float:right;border:0;background:none;font-size:22px;cursor:pointer;color:#7a6f61}
-  .hg-pp{margin-top:14px;min-height:48px}
-  .hg-link{display:block;text-align:center;background:#ffc439;color:#111;border-radius:24px;padding:12px;font-weight:600;text-decoration:none}
-  .hg-note{font-size:12px;color:#7a6f61;margin-top:10px}
-  @media (prefers-color-scheme: dark){.hg-pill,.hg-feed,.hg-sheet{background:#1f1c19;color:#f2ede6;border-color:#3a342d}.hg-row{border-color:#2c2823}.hg-feed h4{border-color:#2c2823}}
+  .hg-scrim{position:fixed;inset:0;z-index:2147483001;background:rgba(20,16,12,.35);display:flex;align-items:flex-end;justify-content:center;animation:hg-fade .2s ease-out}
+  .hg-sheet{width:min(440px,100%);background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.18);padding:22px 20px 26px;font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;color:#1d1a16;animation:hg-up .28s cubic-bezier(.2,.8,.2,1)}
+  @media (min-width:600px){.hg-scrim{align-items:center}.hg-sheet{border-radius:20px}}
+  @keyframes hg-up{from{transform:translateY(24px);opacity:0}}
+  @keyframes hg-fade{from{opacity:0}}
+  .hg-kicker{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#1f7a45}
+  .hg-sheet h3{margin:4px 0 14px;font-size:20px;letter-spacing:-.01em}
+  .hg-lines{margin:0 0 12px;padding:0;list-style:none;border-top:1px solid #efe9df}
+  .hg-lines li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #efe9df;font-size:14px}
+  .hg-lines li span:last-child{font-variant-numeric:tabular-nums}
+  .hg-total{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:18px}
+  .hg-was{text-decoration:line-through;color:#8a8073;font-weight:400;font-size:14px;margin-right:6px}
+  .hg-save{display:inline-block;margin-top:6px;color:#1f7a45;background:#e3f3e9;font-weight:600;font-size:13px;padding:3px 9px;border-radius:999px}
+  .hg-close{float:right;border:0;background:#f3eee7;width:30px;height:30px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer;color:#5c5246}
+  .hg-pp{margin-top:16px;min-height:48px}
+  .hg-link{display:block;text-align:center;background:#ffc439;color:#111;border-radius:24px;padding:13px;font-weight:700;text-decoration:none}
+  .hg-link:hover{filter:brightness(.97)}
+  .hg-note{font-size:12px;color:#7a6f61;margin-top:12px;text-align:center}
+  @media (prefers-color-scheme: dark){.hg-pill,.hg-feed,.hg-sheet{background:#1f1c19;color:#f2ede6;border-color:#3a342d}.hg-pill small,.hg-note{color:#a99d8e}.hg-row,.hg-feed h4,.hg-lines,.hg-lines li{border-color:#2c2823}.hg-close{background:#2c2823;color:#d8cfc4}.hg-save{background:#17301f;color:#5cc98b}.hg-kicker{color:#5cc98b}}
   `;
 
   let feedEl, pillLabel;
@@ -197,7 +208,7 @@
     wrap.className = 'hg-badge';
     wrap.innerHTML = `<div class="hg-feed" role="log" aria-live="polite"><h4>Agent activity</h4></div>
       <div class="hg-pill" role="button" tabindex="0" title="${registered ? 'AI agents can shop and make offers here (WebMCP)' : 'WebMCP is not on in this browser'}">
-        <span class="hg-dot"></span><span class="hg-label">${registered ? 'Agent-ready' : 'Agent-ready (WebMCP off in this browser)'}</span></div>`;
+        <span class="hg-dot"></span><span class="hg-label">Agent-ready</span><small>${registered ? 'WebMCP on' : 'WebMCP off here'}</small></div>`;
     document.body.appendChild(wrap);
     feedEl = wrap.querySelector('.hg-feed');
     pillLabel = wrap.querySelector('.hg-label');
@@ -209,7 +220,7 @@
   let pendingRow = null;
   function feed(text, kind) {
     if (!feedEl) return;
-    feedEl.classList.add('open');
+    if (!FEED_CLOSED) feedEl.classList.add('open');
     if (kind !== 'pending' && pendingRow) { pendingRow.remove(); pendingRow = null; }
     const row = document.createElement('div');
     row.className = `hg-row ${kind}`;
@@ -220,6 +231,8 @@
     if (kind === 'done') pillLabel.textContent = 'Agent shopping…';
   }
 
+  const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
   function money(n, currency = 'USD') {
     try { return new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(n); } catch { return `${currency} ${Number(n).toFixed(2)}`; }
   }
@@ -229,21 +242,31 @@
   const config = () => (configPromise ??= fetch(`${API}/api/shops/${encodeURIComponent(SHOP)}/config`).then((r) => r.json()));
 
   async function showCheckout(order) {
-    document.querySelector('.hg-sheet')?.remove();
+    document.querySelector('.hg-scrim')?.remove();
     const cfg = await config();
+    const scrim = document.createElement('div');
+    scrim.className = 'hg-scrim';
     const sheet = document.createElement('div');
     sheet.className = 'hg-sheet';
     sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'true');
     sheet.setAttribute('aria-label', 'Approve payment');
+    const lines = (order.items ?? []).map((i) => `<li><span>${i.qty}× ${esc(i.name ?? i.sku)}</span></li>`).join('');
     sheet.innerHTML = `<div class="hg-sheet-in">
       <button class="hg-close" aria-label="Close">×</button>
-      <h3>Your agent got you a deal</h3>
-      <div>${money(order.total, order.currency)}${order.savings > 0 ? `<span class="hg-was">${money(order.listTotal, order.currency)}</span> <span class="hg-save">You save ${money(order.savings, order.currency)}</span>` : ''}</div>
+      <div class="hg-kicker">Your agent got you a deal</div>
+      <h3>Approve ${money(order.total, order.currency)} in PayPal</h3>
+      ${lines ? `<ul class="hg-lines">${lines}</ul>` : ''}
+      <div class="hg-total"><span>Total</span><span>${order.savings > 0 ? `<span class="hg-was">${money(order.listTotal, order.currency)}</span>` : ''}${money(order.total, order.currency)}</span></div>
+      ${order.savings > 0 ? `<span class="hg-save">You save ${money(order.savings, order.currency)}</span>` : ''}
       <div class="hg-pp"></div>
       <div class="hg-note">${cfg.paypalMode === 'sandbox' ? 'PayPal sandbox: test money only.' : 'Mock checkout: no PayPal account, no money moves.'} Your agent can't pay for you. Only you can approve this.</div>
     </div>`;
-    document.body.appendChild(sheet);
-    sheet.querySelector('.hg-close').addEventListener('click', () => sheet.remove());
+    scrim.appendChild(sheet);
+    document.body.appendChild(scrim);
+    const close = () => scrim.remove();
+    sheet.querySelector('.hg-close').addEventListener('click', close);
+    scrim.addEventListener('click', (e) => e.target === scrim && close());
     const pp = sheet.querySelector('.hg-pp');
 
     const done = async () => {
@@ -251,7 +274,7 @@
       if (r?.status === 'paid') {
         pp.innerHTML = `<div class="hg-link" style="background:#1f9d55;color:#fff">Paid ✓</div>`;
         pillLabel.textContent = 'Order placed by your agent';
-        setTimeout(() => sheet.remove(), 4000);
+        setTimeout(close, 4000);
       }
     };
 
