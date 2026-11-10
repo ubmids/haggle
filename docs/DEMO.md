@@ -48,4 +48,4 @@ Double-click a floor, change it, show the next bid getting a different answer if
 
 - Reset the server so the dashboard starts clean, then run one search for "teapot" from two or three agents (or `haggle.call`) so Missed demand has rows.
 - Have the PayPal sandbox buyer account signed in, in the window you'll approve from.
-- If no WebMCP agent is available, drive the same calls from the console with `haggle.call(...)` and say so on screen.
+- If no WebMCP agent is available, use the shop's "Watch an agent buy" box with the same goal. Say on screen that it's the built-in demo agent, and that ChatGPT's browser or Chrome with WebMCP does the same through the one line.

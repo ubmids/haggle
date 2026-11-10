@@ -21,10 +21,10 @@
 
   // ---- Talking to the haggle server ---------------------------------------
 
-  async function callServer(tool, args) {
+  async function callServer(tool, args, agent) {
     const res = await fetch(`${API}/api/shops/${encodeURIComponent(SHOP)}/tools/${tool}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Haggle-Agent': AGENT_LABEL ?? agentName() },
+      headers: { 'Content-Type': 'application/json', 'X-Haggle-Agent': agent ?? AGENT_LABEL ?? agentName() },
       body: JSON.stringify(args ?? {}),
     });
     const json = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
@@ -114,10 +114,10 @@
     },
   ];
 
-  async function run(tool, args) {
+  async function run(tool, args, opts) {
     feed(`${tool.name.replace(/_/g, ' ')}…`, 'pending');
     try {
-      const result = await callServer(tool.name, args);
+      const result = await callServer(tool.name, args, opts?.agent);
       feed(tool.feed(args ?? {}, result), 'done');
       tool.after?.(args ?? {}, result);
       return result;
@@ -155,10 +155,11 @@
     shop: SHOP,
     webmcp: registered,
     tools: TOOLS.map(({ name, description, inputSchema }) => ({ name, description, inputSchema })),
-    call: (name, args) => {
+    // opts.agent names the caller in the merchant view, e.g. a demo agent.
+    call: (name, args, opts) => {
       const tool = TOOLS.find((t) => t.name === name);
       if (!tool) return Promise.reject(new Error(`unknown tool ${name}`));
-      return run(tool, args);
+      return run(tool, args, opts);
     },
     unregister: () => controller.abort(),
   };

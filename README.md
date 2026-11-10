@@ -62,6 +62,8 @@ Then open `http://localhost:3000` for the demo shop and `http://localhost:3000/m
 | `HAGGLE_MODEL` | Optional. The Claude model, `claude-opus-5-5` by default. |
 | `WEBMCP_OT_TOKEN` | Optional. A Chrome WebMCP origin trial token for the host. |
 | `MERCHANT_KEY` | Optional. Locks the merchant view behind `?key=`. |
+| `DEMO_BUYER` | `off` removes the demo buyer endpoint, for a real merchant's host. |
+| `DEMO_BUYER_AI` | `off` keeps the demo buyer on the rules buyer even when an Anthropic key is set. Claude buyer steps are also capped at 300 an hour. |
 | `PORT` | Port to listen on, 3000 by default. |
 
 `render.yaml` deploys it to Render. Set the secrets in Render's dashboard.
@@ -70,7 +72,7 @@ Then open `http://localhost:3000` for the demo shop and `http://localhost:3000/m
 
 - **ChatGPT desktop browser:** open the hosted shop and ask "buy me two green mugs, try to keep it under $30".
 - **Chrome:** turn on `chrome://flags/#enable-webmcp-testing` (or use an origin trial token), then use the Model Context Tool Inspector extension or any WebMCP agent on the shop page.
-- **No WebMCP:** the badge says "WebMCP off in this browser" and the tools still work from the console with `haggle.call('search_products', { query: 'mug' })`.
+- **No WebMCP:** the demo shop has a "Watch an agent buy" box. It runs a buyer agent on the haggle server one step at a time and calls the shop's tools in the page, so the activity feed, the haggling and the PayPal sheet look exactly as they would with a real agent. With an Anthropic key, Claude decides each step; without one, a simple rules buyer does. The server checks every step: only the shop's tools, never over the stated budget, only offers the shop actually made, and it stops at PayPal. The tools also work from the console with `haggle.call('search_products', { query: 'mug' })`.
 
 ## Layout
 
@@ -80,6 +82,8 @@ public/shop/               a plain demo shop with no AI in it
 public/merchant/           the merchant view (AG Grid)
 src/negotiate.js           pricing rules
 src/shopAgent.js           Claude wording, clamped to the rules
+src/buyerAgent.js          the demo buyer agent and the checks on its steps
+public/shop/demo-buyer.js  the demo shop's "Watch an agent buy" box
 src/paypal.js              PayPal Orders v2 sandbox client and the mock
 src/service.js             tools, offers, orders, merchant data
 src/server.js              Express app

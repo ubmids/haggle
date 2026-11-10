@@ -7,11 +7,12 @@ import { SHOPS } from './shops.js';
 import { createPayPal } from './paypal.js';
 import { createShopAgent } from './shopAgent.js';
 import { createService } from './service.js';
+import { createBuyerAgent, cleanSteps } from './buyerAgent.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(here, '..', 'public');
 
-export function createApp({ env = process.env, shops = structuredClone(SHOPS), paypal, shopAgent } = {}) {
+export function createApp({ env = process.env, shops = structuredClone(SHOPS), paypal, shopAgent, buyerAgent } = {}) {
   const publicUrl = (env.PUBLIC_URL ?? '').replace(/\/$/, '');
   paypal ??= createPayPal({
     mode: env.PAYPAL_MODE,
@@ -22,6 +23,9 @@ export function createApp({ env = process.env, shops = structuredClone(SHOPS), p
   const hasClaude = Boolean(env.ANTHROPIC_API_KEY || env.ANTHROPIC_AUTH_TOKEN);
   shopAgent ??= createShopAgent({ client: hasClaude ? new Anthropic() : null, model: env.HAGGLE_MODEL });
   const svc = createService({ shops, paypal, shopAgent, publicUrl });
+  // The demo buyer can be turned off with DEMO_BUYER=off, e.g. on a real merchant's host.
+  const demoBuyer = env.DEMO_BUYER !== 'off';
+  buyerAgent ??= createBuyerAgent({ client: hasClaude && buyerUsesClaude(env) ? new Anthropic() : null, model: env.HAGGLE_MODEL });
 
   const app = express();
   app.disable('x-powered-by');
@@ -47,7 +51,7 @@ export function createApp({ env = process.env, shops = structuredClone(SHOPS), p
   app.get('/api/shops/:shop/config', wrap(async (req) => {
     const s = shops[req.params.shop];
     if (!s) throw Object.assign(new Error('unknown_shop'), { status: 404 });
-    return { shop: s.id, name: s.name, currency: s.currency, paypalMode: paypal.mode, paypalClientId: paypal.clientId ?? null, shopAgent: hasClaude ? 'claude' : 'rules' };
+    return { shop: s.id, name: s.name, currency: s.currency, paypalMode: paypal.mode, paypalClientId: paypal.clientId ?? null, shopAgent: hasClaude ? 'claude' : 'rules', demoBuyer };
   }));
 
   const TOOLS = {
@@ -69,6 +73,17 @@ export function createApp({ env = process.env, shops = structuredClone(SHOPS), p
     if (!fn) throw Object.assign(new Error('unknown_tool'), { status: 404 });
     const agent = String(req.get('X-Haggle-Agent') ?? '').slice(0, 60) || 'unknown agent';
     return fn(req.params.shop, req.body ?? {}, agent);
+  }));
+
+  // Demo buyer agent: the page sends the goal and the steps so far, and runs the next
+  // tool itself through window.haggle.call, so the person sees every step. It never pays.
+  app.post('/api/shops/:shop/demo-buyer/step', wrap(async (req) => {
+    if (!demoBuyer) throw Object.assign(new Error('demo_buyer_off'), { status: 404 });
+    const s = shops[req.params.shop];
+    if (!s) throw Object.assign(new Error('unknown_shop'), { status: 404 });
+    const goal = typeof req.body?.goal === 'string' ? req.body.goal : '';
+    if (!goal.trim()) throw Object.assign(new Error('goal_required'), { status: 400 });
+    return buyerAgent({ shopName: s.name, goal, steps: cleanSteps(req.body?.steps) });
   }));
 
   // Merchant view. Set MERCHANT_KEY to require ?key=... (the demo leaves it open).
@@ -126,6 +141,10 @@ export function createApp({ env = process.env, shops = structuredClone(SHOPS), p
   app.get('/healthz', (req, res) => res.json({ ok: true, paypal: paypal.mode }));
 
   return { app, svc, paypal };
+}
+
+function buyerUsesClaude(env) {
+  return env.DEMO_BUYER_AI !== 'off';
 }
 
 function esc(s) {
