@@ -66,7 +66,13 @@ Then open `http://localhost:3000` for the demo shop and `http://localhost:3000/m
 | `DEMO_BUYER_AI` | `off` keeps the demo buyer on the rules buyer even when an Anthropic key is set. Claude buyer steps are also capped at 300 an hour. |
 | `PORT` | Port to listen on, 3000 by default. |
 
-`render.yaml` deploys it to Render. Set the secrets in Render's dashboard.
+## Hosting
+
+The demo runs on Vercel at https://haggle-jet.vercel.app (merchant view at `/merchant/`). `src/server.js` exports a request handler for Vercel and reads `VERCEL_PROJECT_PRODUCTION_URL` when `PUBLIC_URL` isn't set; `vercel.json` bundles `public/` and AG Grid with the function. Set the secrets in the Vercel project's environment variables, and remove `PAYPAL_MODE=mock` once the PayPal sandbox keys are in.
+
+Negotiations and orders are kept in memory, so they reset when the server sleeps or restarts. That's fine for a demo; a real merchant would add a database.
+
+`render.yaml` deploys the same app to Render instead.
 
 ## Try it with an agent
 

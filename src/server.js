@@ -13,7 +13,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(here, '..', 'public');
 
 export function createApp({ env = process.env, shops = structuredClone(SHOPS), paypal, shopAgent, buyerAgent } = {}) {
-  const publicUrl = (env.PUBLIC_URL ?? '').replace(/\/$/, '');
+  // On Vercel the production address is known without setting PUBLIC_URL.
+  const vercelUrl = env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}` : '';
+  const publicUrl = (env.PUBLIC_URL || vercelUrl).replace(/\/$/, '');
   paypal ??= createPayPal({
     mode: env.PAYPAL_MODE,
     clientId: env.PAYPAL_CLIENT_ID,
@@ -165,6 +167,14 @@ function mockPage(o) {
 <p style="background:#fff3cd;padding:8px 12px;border-radius:6px">Mock mode: this stands in for PayPal's sandbox approval page. No money moves.</p>
 <h1>Approve ${esc(o.total.toFixed(2))} USD?</h1><p>Order ${esc(o.id)}</p>
 <form method="post" action="/mock-paypal/${encodeURIComponent(o.id)}/approve"><button style="font-size:18px;padding:12px 24px;background:#ffc439;border:0;border-radius:24px">Pay now</button></form></body>`;
+}
+
+// Vercel runs the app as a function: it imports this file and calls the default export.
+// The app is made on the first request, so importing this file in tests stays cheap.
+let vercelApp;
+export default function handler(req, res) {
+  vercelApp ??= createApp().app;
+  return vercelApp(req, res);
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
