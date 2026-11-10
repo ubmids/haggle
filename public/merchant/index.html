@@ -134,10 +134,10 @@
       overlayNoRowsTemplate: empty('Nothing missed yet. Try asking the agent for a blue teapot.'),
       getRowId: (p) => p.data.what,
       columnDefs: [
-        { field: 'what', headerName: 'What they wanted', flex: 3, minWidth: 220 },
-        { field: 'kind', headerName: 'Type', valueFormatter: (p) => p.value === 'search_miss' ? 'not in stock' : 'price too low', maxWidth: 140 },
-        { field: 'count', headerName: 'Times', sort: 'desc', maxWidth: 90 },
-        { field: 'last', headerName: 'Last asked', valueFormatter: (p) => time(p.value), maxWidth: 120 },
+        { field: 'what', headerName: 'What they wanted', flex: 3, minWidth: 170, tooltipField: 'what' },
+        { field: 'kind', headerName: 'Type', valueFormatter: (p) => p.value === 'search_miss' ? 'not in stock' : 'price too low', minWidth: 110, maxWidth: 130 },
+        { field: 'count', headerName: 'Times', sort: 'desc', minWidth: 80, maxWidth: 90 },
+        { field: 'last', headerName: 'Last asked', valueFormatter: (p) => time(p.value), minWidth: 110, maxWidth: 120 },
       ],
     });
     const products = agGrid.createGrid(document.getElementById('products'), { ...base,
