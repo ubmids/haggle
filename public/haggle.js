@@ -66,7 +66,7 @@
         },
       },
       annotations: { readOnlyHint: true },
-      feed: (a, r) => `searched “${a.query ?? ''}”: ${r.results.length} found`,
+      feed: (a, r) => `searched “${a.query ?? ''}”: ${r.match === 'exact' ? `${r.results.length} found` : r.results.length ? 'no exact match' : 'nothing found'}`,
     },
     {
       name: 'get_product',
@@ -218,6 +218,7 @@
   }
 
   let pendingRow = null;
+  let idleTimer;
   function feed(text, kind) {
     if (!feedEl) return;
     if (!FEED_CLOSED) feedEl.classList.add('open');
@@ -228,7 +229,11 @@
     feedEl.appendChild(row);
     feedEl.scrollTop = feedEl.scrollHeight;
     if (kind === 'pending') pendingRow = row;
-    if (kind === 'done') pillLabel.textContent = 'Agent shopping…';
+    if (kind === 'done') {
+      pillLabel.textContent = 'Agent shopping…';
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => { if (pillLabel.textContent === 'Agent shopping…') pillLabel.textContent = 'Agent-ready'; }, 15000);
+    }
   }
 
   const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);

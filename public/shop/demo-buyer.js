@@ -25,9 +25,11 @@
     return e;
   }
 
-  function message(side, text, { who, tool, kind } = {}) {
+  function message(side, text, { who, tool, kind, ai } = {}) {
     const li = el('li', `msg ${side}${kind ? ` ${kind}` : ''}`);
-    li.append(el('span', 'who', who ?? (side === 'buyer' ? 'Buyer agent' : "Shop's agent")), el('div', 'bubble', text));
+    const label = el('span', 'who', who ?? (side === 'buyer' ? 'Buyer agent' : "Shop's agent"));
+    if (ai) label.append(el('span', 'ai', 'Claude'));
+    li.append(label, el('div', 'bubble', text));
     if (tool) li.append(tool);
     log.append(li);
     follow();
@@ -87,7 +89,7 @@
     if (action === 'request_offer') {
       showDeal(result.listTotal, result.total, result.status === 'accepted');
       const line = el('div', 'tool', `${VERB[result.status] ?? result.status}: ${money(result.total)}`);
-      return message('shop', result.message || `${VERB[result.status]}: ${money(result.total)}`, { tool: line });
+      return message('shop', result.message || `${VERB[result.status]}: ${money(result.total)}`, { tool: line, ai: result.wordedBy === 'claude' });
     }
     if (action === 'accept_offer') {
       showDeal(result.listTotal, result.total, true);
@@ -130,8 +132,9 @@
         const dots = typing('buyer');
         const [step] = await Promise.all([next(goal, steps), wait(500)]);
         dots.remove();
-        if (step.action === 'done') { message('buyer', step.say || 'Done.', { kind: 'done' }); break; }
-        message('buyer', step.say || step.action, { tool: toolLine(step.action, step.args) });
+        const ai = step.by === 'claude';
+        if (step.action === 'done') { message('buyer', step.say || 'Done.', { kind: 'done', ai }); break; }
+        message('buyer', step.say || step.action, { tool: toolLine(step.action, step.args), ai });
         const shopDots = step.action === 'request_offer' ? typing('shop') : null;
         const [result] = await Promise.all([window.haggle.call(step.action, step.args, { agent: AGENT }), wait(shopDots ? 700 : 250)]);
         shopDots?.remove();
