@@ -127,6 +127,7 @@ export function createService({ shops, paypal, shopAgent, now = () => Date.now()
       savings: Math.round((cart.listTotal - total) * 100) / 100,
       currency: cart.currency,
       message: r.message,
+      wordedBy: r.by === 'claude' ? 'claude' : 'rules',
       round: d.round,
       expiresAt: acceptable ? offer.expiresAt : null,
       next: acceptable
@@ -213,7 +214,7 @@ export function createService({ shops, paypal, shopAgent, now = () => Date.now()
       orders: [...orders.values()].filter(mine).reverse(),
       negotiations: [...negotiations.values()].filter(mine).map((n) => ({
         id: n.id, agent: n.agent, startedAt: n.startedAt, rounds: n.round,
-        items: n.items.map((i) => `${i.qty}× ${i.sku}`).join(', '),
+        items: n.items.map((i) => `${i.qty}× ${s.catalog.find((p) => p.sku === i.sku)?.name ?? i.sku}`).join(', '),
         lastTotal: n.lastCounter, final: n.final,
         history: n.history,
       })).reverse(),

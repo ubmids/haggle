@@ -116,3 +116,12 @@ test('the script tag and shop page are served, with CORS for the tool API', asyn
   const pre = await fetch(`${base}/api/shops/ikoko/tools/search_products`, { method: 'OPTIONS' });
   assert.equal(pre.headers.get('access-control-allow-origin'), '*');
 });
+
+test('offers say who worded them, and the merchant view names products', async () => {
+  const items = [{ sku: 'bowl-terracotta', qty: 1 }];
+  const r = await tool('request_offer', { items, bid: 20 });
+  assert.equal(r.body.wordedBy, 'rules');
+  const view = await (await fetch(`${base}/api/merchant/ikoko`)).json();
+  const neg = view.negotiations.find((n) => n.id === r.body.negotiationId);
+  assert.equal(neg.items, '1× Terracotta soup bowl');
+});

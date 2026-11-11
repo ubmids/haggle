@@ -94,6 +94,7 @@ button { font: inherit; cursor: pointer; }
 .transcript:empty { display: none; }
 .msg { display: flex; flex-direction: column; max-width: 92%; animation: rise .25s ease-out; }
 .msg .who { font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin: 0 4px 3px; }
+.msg .who .ai { margin-left: 6px; padding: 1px 7px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); font-weight: 600; letter-spacing: 0; text-transform: none; }
 .msg .bubble { padding: 9px 12px; border-radius: 14px; font-size: 14px; line-height: 1.45; }
 .msg.buyer { align-self: flex-end; align-items: flex-end; }
 .msg.buyer .bubble { background: var(--agent); color: var(--agent-ink); border-bottom-right-radius: 4px; }

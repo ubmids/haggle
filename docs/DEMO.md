@@ -26,7 +26,7 @@ Let the activity feed on the page tick through: search, request_offer at $25, th
 
 ## 1:25 to 1:55. The person pays in PayPal
 
-The sheet appears: "Your agent got you a deal. Was $36, you save $7." Click the PayPal button, approve in the sandbox window.
+The approval card appears: "Your agent got you a deal. Approve $29.00 in PayPal. You save $7.00." Click the PayPal button, approve in the sandbox window.
 
 > "The agent can't spend money. The person sees the deal and approves it in PayPal themselves. The order is exactly $29, with the discount itemised in PayPal."
 
@@ -48,4 +48,5 @@ Double-click a floor, change it, show the next bid getting a different answer if
 
 - Reset the server so the dashboard starts clean, then run one search for "teapot" from two or three agents (or `haggle.call`) so Missed demand has rows.
 - Have the PayPal sandbox buyer account signed in, in the window you'll approve from.
-- If no WebMCP agent is available, use the shop's "Watch an agent buy" box with the same goal. Say on screen that it's the built-in demo agent, and that ChatGPT's browser or Chrome with WebMCP does the same through the one line.
+- If no WebMCP agent is available, use the buyer agent console beside the shop (tap "Two green mugs under $30"). Say on screen that it's the built-in demo agent, and that ChatGPT's browser or Chrome with WebMCP does the same through the one line.
+- With ANTHROPIC_API_KEY set, messages written by Claude show a small Claude tag. If a shop reply has no tag, Claude timed out or failed and the rules engine answered.
